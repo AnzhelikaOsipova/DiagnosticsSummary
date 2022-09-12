@@ -1,0 +1,126 @@
+﻿@page "/childview"
+
+@using AutoMapper
+@using Models
+@using Services
+@using Contexts
+@using DiagnosticsSummary.Services
+@using DiagnosticsSummary.Common.Models
+@using static DiagnosticsSummary.Services.DiagnosticsSummaryManager
+
+<PageTitle>Список детей</PageTitle>
+
+<h1>Список детей</h1>
+
+@if(infoLabel is not null)
+{
+    <div class="row">
+        <label>@infoLabel</label>
+    </div>    
+}
+
+@if (children is not null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Номер</th>
+                <th>@HtmlChildService.LabelDictionary[HtmlChildService.LabelList.FIO]</th>
+                <th>@HtmlChildService.LabelDictionary[HtmlChildService.LabelList.Gender]</th>
+                <th>@HtmlChildService.LabelDictionary[HtmlChildService.LabelList.Age]</th>
+                <th>@HtmlChildService.LabelDictionary[HtmlChildService.LabelList.AgeGroup]</th>
+                <th>@HtmlChildService.LabelDictionary[HtmlChildService.LabelList.Group]</th>
+                <th>@HtmlChildService.LabelDictionary[HtmlChildService.LabelList.Diagnosis]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var child in children)
+            {
+                <tr class=@RowBackground(child.Id)
+                    @onclick=@(()=>{selectedChild = child;})>
+                        <td>@(children.FindIndex((c) => c == child) + 1)</td>
+                        <td>@child.FIO</td>
+                        <td>@HtmlChildService.GenderConvert(child.Gender)</td>
+                        <td>@child.Age</td>
+                        <td>@HtmlChildService.AgeGroupConvert(child.AgeGroup)</td>
+                        <td>@(child.Group.Substring(0, 1).ToUpper() + child.Group.Substring(1))</td>
+                        <td>@HtmlChildService.DiagnosisConvert(child.Diagnosis)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<button @onclick="OnFindClick">Найти</button>
+<button @onclick="OnAddClick">Добавить</button>
+@if (selectedChild is not null)
+{
+    <button @onclick="OnUpdateClick">Изменить</button>
+    <button @onclick="OnDeleteClick">Удалить</button>
+    <button @onclick=@(() => {selectedChild = null;})>Сбросить выделение</button>
+}
+
+@code {
+    string? infoLabel { get; set; } = null;
+    List<ChildInfo>? children { get; set; } = null;
+    static ActionType? actionRequired { get; set; } = null;
+    static ChildInfo? selectedChild { get; set; } = null;
+
+    [Inject]
+    IMapper mapper { get; set; }
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+    [Inject]
+    DiagnosticsSummaryManager manager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CheckRequiredAction();
+    }
+
+    private void CheckRequiredAction()
+    {
+        if (actionRequired is not null)
+        {
+            var childData = mapper.Map<ChildInfo>(DataInputContext.Fields);
+            childData.Id = selectedChild is not null ? selectedChild.Id : 0;
+            var res = manager.UseAction(actionRequired.Value, childData);
+            children = res.Result;
+            infoLabel = res.Message;
+            actionRequired = null;
+            selectedChild = null;
+        }
+    }
+
+    private string RowBackground(int id)
+    {
+        return (selectedChild is null || selectedChild.Id != id) ? "row-notselected" : "row-selected";
+    }
+
+    public void OnFindClick()
+    {
+        actionRequired = DiagnosticsSummaryManager.ActionType.Read;
+        DataInputContext.FillContext("/childview", true, HtmlChildService.ChildInfoInitialize);
+        navigationManager.NavigateTo("/datainput");
+    }
+
+    public void OnAddClick()
+    {
+        actionRequired = DiagnosticsSummaryManager.ActionType.Create;
+        DataInputContext.FillContext("/childview", false, HtmlChildService.ChildInfoInitialize);
+        navigationManager.NavigateTo("/datainput");
+    }
+
+    public void OnDeleteClick()
+    {
+        actionRequired = DiagnosticsSummaryManager.ActionType.Delete;
+        CheckRequiredAction();
+    }
+
+    public void OnUpdateClick()
+    {
+        actionRequired = DiagnosticsSummaryManager.ActionType.Update;
+        DataInputContext.FillContext("/childview", true, HtmlChildService.ChildInfoInitialize);
+        navigationManager.NavigateTo("/datainput");
+    }
+}

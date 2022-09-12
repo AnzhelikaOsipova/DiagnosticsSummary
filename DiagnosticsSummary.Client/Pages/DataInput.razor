@@ -1,0 +1,58 @@
+﻿@page "/datainput"
+
+@using Models
+@using static DiagnosticsSummary.Client.Contexts.DataInputContext
+
+
+<div class="row">
+    <label>@MainLabel</label>
+    @foreach (var field in Fields)
+    {
+        <label>@field.Label: </label>
+        @if (field.HtmlMethod == HtmlType.Method.Input)
+        {
+            <input type=@field.InputType @bind-value="@field.Value" />
+        }
+        else
+        {
+            <select class="custom-select"
+            @bind="@field.Value">
+                <option disabled selected>(Выберите)</option>
+                @foreach (var obj in field.SelectObjects)
+                {
+                    <option value=@obj.Value> @obj.Name</option>
+                }
+            </select>
+        }
+    }
+</div>
+<button @onclick="OnButtonOkClick">Выполнить</button>
+<button @onclick="OnButtonCancelClick">Сбросить</button>
+
+@code {
+    string MainLabel = "Введите данные";
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+
+    public void OnButtonOkClick()
+    {
+        foreach (var field in Fields)
+        {
+            if (!(AreNullsAvailable && (field.Value is null)) &&
+            !field.IsValidValue(field.Value))
+            {
+                MainLabel = "Неверно введены данные в поле " + field.Label;
+                return;
+            }
+        }
+        navigationManager.NavigateTo(OkNavigateTo);
+    }
+
+    public void OnButtonCancelClick()
+    {
+        foreach (var field in Fields)
+        {
+            field.Value = null;
+        }
+    }
+}

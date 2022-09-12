@@ -1,0 +1,7 @@
+﻿.row-selected {
+    background-color: lightblue;
+}
+
+.row-notselected {
+    background-color: white;
+}
