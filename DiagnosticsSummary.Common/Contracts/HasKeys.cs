@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DiagnosticsSummary.Common.Contracts
 {
-    public interface IHasIdProperty<T>
+    public interface IHasKeys
     {
-        public T Id { get; set; }
+        IEnumerable<object> Keys { get; }
     }
 }

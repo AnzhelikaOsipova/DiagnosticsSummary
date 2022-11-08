@@ -21,7 +21,7 @@ namespace DiagnosticsSummary.Client.Mapper
         }
         public ChildInfoMapperProfile()
         {
-            CreateMap<HtmlType[], ChildInfo>()
+            CreateMap<HtmlType[], Child>()
                 .ForMember(info => info.FIO, opt => opt.MapFrom(fields =>
                 fields.Where(f => f.Label == LabelDictionary[LabelList.FIO]).FirstOrDefault().Value))
                 .ForMember(info => info.Gender, opt => opt.MapFrom(fields =>

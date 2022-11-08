@@ -16,8 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DiagnosticsSummary.Common\DiagnosticsSummary.Common.csproj" />
-    <ProjectReference Include="..\DiagnosticsSummary.Services\DiagnosticsSummary.Services.csproj" />
-    <ProjectReference Include="..\DiagnosticSummary.DataLayer\DiagnosticSummary.DataLayer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -62,9 +62,9 @@
 
 @code {
     string? infoLabel { get; set; } = null;
-    List<ChildInfo>? children { get; set; } = null;
+    List<Child>? children { get; set; } = null;
     static ActionType? actionRequired { get; set; } = null;
-    static ChildInfo? selectedChild { get; set; } = null;
+    static Child? selectedChild { get; set; } = null;
 
     [Inject]
     IMapper mapper { get; set; }
@@ -82,7 +82,7 @@
     {
         if (actionRequired is not null)
         {
-            var childData = mapper.Map<ChildInfo>(DataInputContext.Fields);
+            var childData = mapper.Map<Child>(DataInputContext.Fields);
             childData.Id = selectedChild is not null ? selectedChild.Id : 0;
             var res = manager.UseAction(actionRequired.Value, childData);
             children = res.Result;

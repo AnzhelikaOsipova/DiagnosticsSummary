@@ -120,86 +120,86 @@ namespace DiagnosticsSummary.Client.Services
             };
         }
 
-        public static ChildInfo.GenderType? GenderConvert(string gender)
+        public static Child.GenderType? GenderConvert(string gender)
         {
             switch(gender)
             {
                 case "Male":
-                    return ChildInfo.GenderType.Male;
+                    return Child.GenderType.Male;
                 case "Female":
-                    return ChildInfo.GenderType.Female;
+                    return Child.GenderType.Female;
                 default:
                     return null;
             }
         }
 
-        public static string? GenderConvert(ChildInfo.GenderType? gender)
+        public static string? GenderConvert(Child.GenderType? gender)
         {
             switch (gender)
             {
-                case ChildInfo.GenderType.Male:
+                case Child.GenderType.Male:
                     return "Мужской";
-                case ChildInfo.GenderType.Female:
+                case Child.GenderType.Female:
                     return "Женский";
                 default:
                     return null;
             }
         }
 
-        public static ChildInfo.AgeGroupType? AgeGroupConvert(string group)
+        public static Child.AgeGroupType? AgeGroupConvert(string group)
         {
             switch(group)
             {
                 case "Junior":
-                    return ChildInfo.AgeGroupType.Junior;
+                    return Child.AgeGroupType.Junior;
                 case "Middle":
-                    return ChildInfo.AgeGroupType.Middle;
+                    return Child.AgeGroupType.Middle;
                 case "Senior":
-                    return ChildInfo.AgeGroupType.Senior;
+                    return Child.AgeGroupType.Senior;
                 case "Preschool":
-                    return ChildInfo.AgeGroupType.Preschool;
+                    return Child.AgeGroupType.Preschool;
                 default:
                     return null;
             }
         }
 
-        public static string? AgeGroupConvert(ChildInfo.AgeGroupType? group)
+        public static string? AgeGroupConvert(Child.AgeGroupType? group)
         {
             switch (group)
             {
-                case ChildInfo.AgeGroupType.Junior:
+                case Child.AgeGroupType.Junior:
                     return "Младшая";
-                case ChildInfo.AgeGroupType.Middle:
+                case Child.AgeGroupType.Middle:
                     return "Средняя";
-                case ChildInfo.AgeGroupType.Senior:
+                case Child.AgeGroupType.Senior:
                     return "Старшая";
-                case ChildInfo.AgeGroupType.Preschool:
+                case Child.AgeGroupType.Preschool:
                     return "Подготовительная";
                 default:
                     return null;
             }
         }
 
-        public static ChildInfo.DiagnosisType? DiagnosisConvert(string diagnosis)
+        public static Child.DiagnosisType? DiagnosisConvert(string diagnosis)
         {
             switch(diagnosis)
             {
                 case "TNR":
-                    return ChildInfo.DiagnosisType.TNR;
+                    return Child.DiagnosisType.TNR;
                 case "ZPR":
-                    return ChildInfo.DiagnosisType.ZPR;
+                    return Child.DiagnosisType.ZPR;
                 default:
                     return null;
             }
         }
 
-        public static string? DiagnosisConvert(ChildInfo.DiagnosisType? diagnosis)
+        public static string? DiagnosisConvert(Child.DiagnosisType? diagnosis)
         {
             switch (diagnosis)
             {
-                case ChildInfo.DiagnosisType.TNR:
+                case Child.DiagnosisType.TNR:
                     return "ТНР";
-                case ChildInfo.DiagnosisType.ZPR:
+                case Child.DiagnosisType.ZPR:
                     return "ЗПР";
                 default:
                     return null;
