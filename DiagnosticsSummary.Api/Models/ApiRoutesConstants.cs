@@ -14,7 +14,7 @@
             public const string
                 Find = "find",
                 Create = "create",
-                Update = "update",
+                Update = "update/{id}",
                 Delete = "delete/{id}";
         }
 
@@ -33,7 +33,7 @@
             public const string
                 Find = "find",
                 Create = "create",
-                Update = "update",
+                Update = "update/{id}",
                 Delete = "delete/{id}";
         }
     }

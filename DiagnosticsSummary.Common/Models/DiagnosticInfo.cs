@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-
+﻿
 namespace DiagnosticsSummary.Common.Models
 {
     public class DiagnosticInfo
@@ -7,11 +6,11 @@ namespace DiagnosticsSummary.Common.Models
         public string Name { get; set; }
 
         public string ValueInterpreter { get; set; } = "";
-        private Dictionary<(int start, int end), string> ValueInterpreterDict { get; set; } = null;
+        private Dictionary<(int start, int end), string> ValueInterpreterDict { get; set; }
 
         public string Interpret(int value)
         {
-            if(ValueInterpreterDict is null)
+            if (ValueInterpreterDict is null)
             {
                 ValueInterpreterDict = DiagnosticInfoInterpreterParser.Parse(ValueInterpreter);
             }

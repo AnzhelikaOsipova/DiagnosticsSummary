@@ -1,7 +1,7 @@
 ﻿using DiagnosticsSummary.Api.Models;
-using DiagnosticsSummary.Api.Services;
 using DiagnosticsSummary.Common.Models;
 using Microsoft.AspNetCore.Mvc;
+using DiagnosticsSummary.Services.Contracts;
 
 namespace DiagnosticsSummary.Api.Controllers
 {
@@ -9,53 +9,71 @@ namespace DiagnosticsSummary.Api.Controllers
     [Route(ApiRoutesConstants.ControllersRoutes.DiagnosticInfoApi)]
     public class DiagnosticInfoController : Controller
     {
-        private readonly DiagnosticInfoService diagnosticInfoService;
-        private readonly DiagnosticService diagnosticService;
+        private readonly IDiagnosticInfoService _diagnosticInfoService;
+        private readonly IDiagnosticService _diagnosticService;
 
-        public DiagnosticInfoController(DiagnosticInfoService diagnosticInfoService, DiagnosticService diagnosticService)
+        public DiagnosticInfoController(IDiagnosticInfoService diagnosticInfoService, IDiagnosticService diagnosticService)
         {
-            this.diagnosticInfoService = diagnosticInfoService;
-            this.diagnosticService = diagnosticService;
+            _diagnosticInfoService = diagnosticInfoService;
+            _diagnosticService = diagnosticService;
         }
 
         [HttpGet(ApiRoutesConstants.DiagnosticInfo.Find)]
-        public async Task<IActionResult> FindAsync(string name) =>
-            (await diagnosticInfoService.FindAsync(name)).Match<IActionResult>(
+        public async Task<IActionResult> FindAsync(string name)
+        {
+            var diagnosticResult = await _diagnosticInfoService.FindAsync(name);
+            return diagnosticResult.Match<IActionResult>(
                 d => Ok(d),
                 e => BadRequest(e.Message)
                 );
+        }
 
         [HttpGet(ApiRoutesConstants.DiagnosticInfo.GetAll)]
-        public async Task<IActionResult> GetAllAsync() =>
-            (await diagnosticInfoService.GetAllAsync()).Match<IActionResult>(
+        public async Task<IActionResult> GetAllAsync()
+        {
+            var diagnosticsResult = await _diagnosticInfoService.GetAllAsync();
+            return diagnosticsResult.Match<IActionResult>(
                 ld => Ok(ld),
                 e => BadRequest(e.Message)
                 );
+        }
 
-        [HttpPut(ApiRoutesConstants.DiagnosticInfo.Create)]
-        public async Task<IActionResult> CreateAsync([FromBody] DiagnosticInfo newDiagnostic) =>
-            (await diagnosticInfoService.CreateAsync(newDiagnostic)).Match<IActionResult>(
+        [HttpPost(ApiRoutesConstants.DiagnosticInfo.Create)]
+        public async Task<IActionResult> CreateAsync([FromBody] DiagnosticInfo newDiagnostic)
+        {
+            var createResult = await _diagnosticInfoService.CreateAsync(newDiagnostic);
+            return createResult.Match<IActionResult>(
                 e => BadRequest(e.Message),
                 Ok);
+        }
 
-        [HttpPost(ApiRoutesConstants.DiagnosticInfo.Update)]
-        public async Task<IActionResult> UpdateChildAsync([FromBody] DiagnosticInfo updatedDiagnostic) =>
-            (await diagnosticInfoService.UpdateAsync(updatedDiagnostic)).Match<IActionResult>(
+        [HttpPut(ApiRoutesConstants.DiagnosticInfo.Update)]
+        public async Task<IActionResult> UpdateAsync([FromBody] DiagnosticInfo updatedDiagnostic)
+        {
+            var updateResult = await _diagnosticInfoService.UpdateAsync(updatedDiagnostic);
+            return updateResult.Match<IActionResult>(
                 e => BadRequest(e.Message),
                 Ok);
+        }
 
         [HttpDelete(ApiRoutesConstants.DiagnosticInfo.Delete)]
-        public async Task<IActionResult> DeleteChildAsync(string name)
+        public async Task<IActionResult> DeleteAsync(string name)
         {
-            var dels = (await diagnosticService.FindDiagnosticsAsync(new Diagnostic() { Name = name })
+            var deleteResult = await _diagnosticService.FindDiagnosticsAsync(new DiagnosticFilter() { Name = name })
                 .MapAsync(ld => ld.Select(d => d.Id))
-                .MapAsync(ids => diagnosticService.DeleteManyAsync(ids)))
+                .MapAsync(ids => _diagnosticService.DeleteManyAsync(ids));
+            var deleteMessage = deleteResult
                 .Match<string>(
                 oe => oe.Match(e => e.Message, ""),
                 e => e.Message
                 );
-            if (!String.IsNullOrEmpty(dels)) return BadRequest(dels);
-            return (await diagnosticInfoService.DeleteAsync(name)).Match<IActionResult>(
+
+            if (!String.IsNullOrEmpty(deleteMessage))
+            {
+                return BadRequest(deleteMessage);
+            }
+
+            return (await _diagnosticInfoService.DeleteAsync(name)).Match<IActionResult>(
                 e => BadRequest(e.Message),
                 Ok);
         }

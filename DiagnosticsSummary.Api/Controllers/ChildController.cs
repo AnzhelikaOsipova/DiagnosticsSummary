@@ -1,8 +1,8 @@
-﻿using DiagnosticsSummary.Api.Services;
-using DiagnosticsSummary.Common.Models;
+﻿using DiagnosticsSummary.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 using DiagnosticsSummary.Api.Models;
 using LanguageExt;
+using DiagnosticsSummary.Services.Contracts;
 
 namespace DiagnosticsSummary.Api.Controllers
 {
@@ -10,46 +10,61 @@ namespace DiagnosticsSummary.Api.Controllers
     [Route(ApiRoutesConstants.ControllersRoutes.ChildApi)]
     public class ChildController : Controller
     {
-        private readonly ChildService childService;
-        private readonly DiagnosticService diagnosticService;
+        private readonly IChildService _childService;
+        private readonly IDiagnosticService _diagnosticService;
 
-        public ChildController(ChildService childService, DiagnosticService diagnosticService)
+        public ChildController(IChildService childService, IDiagnosticService diagnosticService)
         {
-            this.childService = childService;
-            this.diagnosticService = diagnosticService;
+            _childService = childService;
+            _diagnosticService = diagnosticService;
         }
 
-        [HttpPost(ApiRoutesConstants.Child.Find)]
-        public async Task<IActionResult> FindChildrenAsync([FromBody] Child filter) =>
-            (await childService.FindChildrenAsync(filter)).Match<IActionResult>(
-                ch => Ok(ch),
+        [HttpGet(ApiRoutesConstants.Child.Find)]
+        public async Task<IActionResult> FindChildrenAsync([FromQuery] ChildFilter filter)
+        {
+            var childrenResult = await _childService.FindChildrenAsync(filter);
+            return childrenResult.Match<IActionResult>(
+                lch => Ok(lch),
                 e => BadRequest(e.Message)
                 );
+        }
 
-        [HttpPut(ApiRoutesConstants.Child.Create)]
-        public async Task<IActionResult> CreateChildAsync([FromBody] Child newChild) =>
-            (await childService.CreateAsync(newChild)).Match<IActionResult>(
+        [HttpPost(ApiRoutesConstants.Child.Create)]
+        public async Task<IActionResult> CreateAsync([FromBody] Child newChild)
+        {
+            var createResult = await _childService.CreateAsync(newChild);
+            return createResult.Match<IActionResult>(
                 e => BadRequest(e.Message),
                 Ok);
+        }
 
-        [HttpPost(ApiRoutesConstants.Child.Update)]
-        public async Task<IActionResult> UpdateChildAsync(Child updatedChild) =>
-            (await childService.UpdateAsync(updatedChild)).Match<IActionResult>(
+        [HttpPut(ApiRoutesConstants.Child.Update)]
+        public async Task<IActionResult> UpdateAsync([FromRoute] int id, [FromBody] ChildFilter updatedChild)
+        {
+            var updateResult = await _childService.UpdateAsync(id, updatedChild);
+            return updateResult.Match<IActionResult>(
                 e => BadRequest(e.Message),
                 Ok);
+        }
 
         [HttpDelete(ApiRoutesConstants.Child.Delete)]
-        public async Task<IActionResult> DeleteChildAsync(int id)
+        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
         {
-            var dels = (await diagnosticService.FindDiagnosticsAsync(new Diagnostic() { ChildId = id })
+            var deleteResult = await _diagnosticService.FindDiagnosticsAsync(new DiagnosticFilter() { ChildId = id })
                 .MapAsync(ld => ld.Select(d => d.Id))
-                .MapAsync(ids => diagnosticService.DeleteManyAsync(ids)))
-                .Match<string>(
+                .MapAsync(ids => _diagnosticService.DeleteManyAsync(ids));
+
+            var deleteMessage = deleteResult.Match<string>(
                 oe => oe.Match(e => e.Message, ""),
                 e => e.Message
                 );
-            if (!String.IsNullOrEmpty(dels)) return BadRequest(dels);
-            return (await childService.DeleteAsync(id)).Match<IActionResult>(
+
+            if (!string.IsNullOrEmpty(deleteMessage))
+            {
+                return BadRequest(deleteMessage);
+            }
+
+            return (await _childService.DeleteAsync(id)).Match<IActionResult>(
                 e => BadRequest(e.Message),
                 Ok);
         }

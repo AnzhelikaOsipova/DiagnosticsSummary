@@ -1,13 +1,16 @@
 ﻿using DiagnosticsSummary.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DiagnosticsSummary.Api.DAL
+namespace DiagnosticsSummary.Api
 {
-    public class DataContext: DbContext
+    public class DataContext : DbContext
     {
         public DataContext(DbContextOptions options) : base(options)
         {
-            if (Database.GetMigrations().Any()) Database.Migrate();
+            if (Database.IsRelational() && Database.GetMigrations().Any())
+            {
+                Database.Migrate();
+            }
         }
         protected override void OnModelCreating(ModelBuilder m)
         {

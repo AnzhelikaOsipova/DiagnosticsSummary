@@ -4,27 +4,27 @@ namespace DiagnosticsSummary.Common
 {
     public static class ChildFieldsMappingLibrary
     {
-        public static Dictionary<Child.GenderType, string> GenderDictionary =
-            new Dictionary<Child.GenderType, string>()
+        public static Dictionary<GenderType, string> GenderDictionary =
+            new Dictionary<GenderType, string>()
             {
-                { Child.GenderType.Male, "Мужской" },
-                { Child.GenderType.Female, "Женский" }
+                { GenderType.Male, "Мужской" },
+                { GenderType.Female, "Женский" }
             };
 
-        public static Dictionary<Child.AgeGroupType, string> AgeGroupDictionary =
-            new Dictionary<Child.AgeGroupType, string>()
+        public static Dictionary<AgeGroupType, string> AgeGroupDictionary =
+            new Dictionary<AgeGroupType, string>()
             {
-                { Child.AgeGroupType.Junior, "Младшая" },
-                { Child.AgeGroupType.Middle, "Средняя" },
-                { Child.AgeGroupType.Senior, "Старшая" },
-                { Child.AgeGroupType.Preschool, "Подготовительная" }
+                { AgeGroupType.Junior, "Младшая" },
+                { AgeGroupType.Middle, "Средняя" },
+                { AgeGroupType.Senior, "Старшая" },
+                { AgeGroupType.Preschool, "Подготовительная" }
             };
 
-        public static Dictionary<Child.DiagnosisType, string> DiagnosisDictionary =
-            new Dictionary<Child.DiagnosisType, string>()
+        public static Dictionary<DiagnosisType, string> DiagnosisDictionary =
+            new Dictionary<DiagnosisType, string>()
             {
-                { Child.DiagnosisType.ZPR, "ЗПР" },
-                { Child.DiagnosisType.TNR, "ТНР" }
+                { DiagnosisType.ZPR, "ЗПР" },
+                { DiagnosisType.TNR, "ТНР" }
             };
     }
 }

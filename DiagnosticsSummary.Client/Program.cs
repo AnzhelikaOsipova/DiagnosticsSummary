@@ -1,9 +1,4 @@
-using DiagnosticsSummary.DataLayer;
-using DiagnosticsSummary.Services;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Debug;
+using DiagnosticsSummary.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,20 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddLogging(log => log.AddProvider(new DebugLoggerProvider()));
-builder.Services.AddSingleton<ILogger>(sp => sp.GetService<ILoggerFactory>().CreateLogger("DLog"));
-builder.Services.AddTransient<DbContextOptions>(sp => new DbContextOptionsBuilder()
-                                                .UseSqlite("Data Source=DiagnosticsSummary.db").Options);
-builder.Services.AddSingleton<IDataAccess, DataAccess>();
-builder.Services.AddTransient<ChildService>();
-builder.Services.AddTransient<DiagnosticsService>();
-builder.Services.AddTransient<DiagnosticsSummaryManager>();
+builder.Services.SetupClientDI();
 
 var app = builder.Build();
 
 Console.ForegroundColor = ConsoleColor.Red;
-Console.WriteLine("Приложение откроется по ссылке: https://localhost:5001");
+Console.WriteLine("Приложение откроется по ссылке: https://localhost:5000");
 Console.ResetColor();
 
 // Configure the HTTP request pipeline.

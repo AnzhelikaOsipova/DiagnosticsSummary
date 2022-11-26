@@ -1,15 +1,14 @@
 ﻿@page "/datainput"
 
-@using Models
+@using DiagnosticsSummary.Client.Models.Input
 @using static DiagnosticsSummary.Client.Contexts.DataInputContext
-
 
 <div class="row">
     <label>@MainLabel</label>
     @foreach (var field in Fields)
     {
         <label>@field.Label: </label>
-        @if (field.HtmlMethod == HtmlType.Method.Input)
+        @if (field.Method == HtmlMethod.Input)
         {
             <input type=@field.InputType @bind-value="@field.Value" />
         }
@@ -27,7 +26,8 @@
     }
 </div>
 <button @onclick="OnButtonOkClick">Выполнить</button>
-<button @onclick="OnButtonCancelClick">Сбросить</button>
+<button @onclick="OnButtonClearClick">Сбросить</button>
+<button @onclick="OnButtonBackClick">Назад</button>
 
 @code {
     string MainLabel = "Введите данные";
@@ -48,11 +48,16 @@
         navigationManager.NavigateTo(OkNavigateTo);
     }
 
-    public void OnButtonCancelClick()
+    public void OnButtonClearClick()
     {
         foreach (var field in Fields)
         {
             field.Value = null;
         }
+    }
+
+    public void OnButtonBackClick()
+    {
+        navigationManager.NavigateTo(BackNavigateTo);
     }
 }

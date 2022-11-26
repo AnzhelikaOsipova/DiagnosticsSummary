@@ -2,7 +2,6 @@
 using LanguageExt;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System;
 
 namespace DiagnosticsSummary.DAL
 {
@@ -20,7 +19,7 @@ namespace DiagnosticsSummary.DAL
         {
             try
             {
-                ctx.Set<T>().Add(newEntity);
+                await ctx.Set<T>().AddAsync(newEntity);
                 await ctx.SaveChangesAsync();
                 return Option<Exception>.None;
             }
@@ -53,7 +52,7 @@ namespace DiagnosticsSummary.DAL
                 var res = await ctx.Set<T>().FindAsync(updatedEntity.Keys);
                 if (res is null)
                 {
-                    ctx.Set<T>().Add(updatedEntity);
+                    await ctx.Set<T>().AddAsync(updatedEntity);
                 }
                 else
                 {
@@ -106,7 +105,7 @@ namespace DiagnosticsSummary.DAL
             }
             catch (Exception e)
             {
-                Log.Logger.Error("Unable to read objects ", typeof(T).Name);
+                Log.Logger.Error("Unable to read objects {1}", typeof(T).Name);
                 return e;
             }
         }

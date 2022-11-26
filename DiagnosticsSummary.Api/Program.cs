@@ -1,4 +1,5 @@
 using DiagnosticsSummary.Api;
+using DiagnosticsSummary.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +7,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-DI.Setup(builder.Services);
+var settings = builder.Configuration.Get<Settings>();
+builder.Services.SetupServerDI(settings);
 
 var app = builder.Build();
 

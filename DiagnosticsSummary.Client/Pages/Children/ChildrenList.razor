@@ -1,12 +1,10 @@
-﻿@page "/childview"
+﻿@page "/childrenlist"
 
 @using AutoMapper
 @using Models
 @using Services
 @using Contexts
-@using DiagnosticsSummary.Services
 @using DiagnosticsSummary.Common.Models
-@using static DiagnosticsSummary.Services.DiagnosticsSummaryManager
 
 <PageTitle>Список детей</PageTitle>
 
@@ -16,7 +14,7 @@
 {
     <div class="row">
         <label>@infoLabel</label>
-    </div>    
+    </div>
 }
 
 @if (children is not null)
@@ -36,15 +34,15 @@
         <tbody>
             @foreach (var child in children)
             {
-                <tr class=@RowBackground(child.Id)
+                <tr class=@RowBackground(child)
                     @onclick=@(()=>{selectedChild = child;})>
                         <td>@(children.FindIndex((c) => c == child) + 1)</td>
                         <td>@child.FIO</td>
-                        <td>@HtmlChildService.GenderConvert(child.Gender)</td>
+                        <td>@child.Gender</td>
                         <td>@child.Age</td>
-                        <td>@HtmlChildService.AgeGroupConvert(child.AgeGroup)</td>
-                        <td>@(child.Group.Substring(0, 1).ToUpper() + child.Group.Substring(1))</td>
-                        <td>@HtmlChildService.DiagnosisConvert(child.Diagnosis)</td>
+                        <td>@child.AgeGroup</td>
+                        <td>@child.Group</td>
+                        <td>@child.Diagnosis</td>
                 </tr>
             }
         </tbody>
@@ -62,16 +60,14 @@
 
 @code {
     string? infoLabel { get; set; } = null;
-    List<Child>? children { get; set; } = null;
+    List<ChildView>? children { get; set; } = null;
     static ActionType? actionRequired { get; set; } = null;
-    static Child? selectedChild { get; set; } = null;
+    static ChildView? selectedChild { get; set; } = null;
 
     [Inject]
     IMapper mapper { get; set; }
     [Inject]
     NavigationManager navigationManager { get; set; }
-    [Inject]
-    DiagnosticsSummaryManager manager { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,45 +78,42 @@
     {
         if (actionRequired is not null)
         {
-            var childData = mapper.Map<Child>(DataInputContext.Fields);
-            childData.Id = selectedChild is not null ? selectedChild.Id : 0;
-            var res = manager.UseAction(actionRequired.Value, childData);
-            children = res.Result;
-            infoLabel = res.Message;
-            actionRequired = null;
-            selectedChild = null;
+            //TODO: send request to backend
+            //var childData = mapper.Map<ChildFilter>(DataInputContext.Fields);            
+            //actionRequired = null;
+            //selectedChild = null;
         }
     }
 
-    private string RowBackground(int id)
+    private string RowBackground(ChildView child)
     {
-        return (selectedChild is null || selectedChild.Id != id) ? "row-notselected" : "row-selected";
+        return (selectedChild is null || selectedChild != child) ? "row-notselected" : "row-selected";
     }
 
     public void OnFindClick()
     {
-        actionRequired = DiagnosticsSummaryManager.ActionType.Read;
-        DataInputContext.FillContext("/childview", true, HtmlChildService.ChildInfoInitialize);
+        actionRequired = ActionType.Read;
+        DataInputContext.FillContext("/childrenlist", "/childrenlist", true, HtmlChildService.ChildInfoInitialize());
         navigationManager.NavigateTo("/datainput");
     }
 
     public void OnAddClick()
     {
-        actionRequired = DiagnosticsSummaryManager.ActionType.Create;
-        DataInputContext.FillContext("/childview", false, HtmlChildService.ChildInfoInitialize);
+        actionRequired = ActionType.Create;
+        DataInputContext.FillContext("/childrenlist", "/childrenlist", false, HtmlChildService.ChildInfoInitialize());
         navigationManager.NavigateTo("/datainput");
     }
 
     public void OnDeleteClick()
     {
-        actionRequired = DiagnosticsSummaryManager.ActionType.Delete;
+        actionRequired = ActionType.Delete;
         CheckRequiredAction();
     }
 
     public void OnUpdateClick()
     {
-        actionRequired = DiagnosticsSummaryManager.ActionType.Update;
-        DataInputContext.FillContext("/childview", true, HtmlChildService.ChildInfoInitialize);
+        actionRequired = ActionType.Update;
+        DataInputContext.FillContext("/childrenlist", "/childrenlist", true, HtmlChildService.ChildInfoInitialize(selectedChild));
         navigationManager.NavigateTo("/datainput");
     }
 }
